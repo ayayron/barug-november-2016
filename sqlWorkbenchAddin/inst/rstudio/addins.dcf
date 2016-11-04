@@ -1,0 +1,4 @@
+Name: SQL Workbench
+Description: Access databases from Rstudio
+Binding: sqlWorkbenchAddin
+Interactive: true
