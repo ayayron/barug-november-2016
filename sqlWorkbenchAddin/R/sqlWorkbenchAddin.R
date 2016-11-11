@@ -5,14 +5,27 @@ sqlWorkbenchAddin <- function() {
   library(miniUI)
   
   ui <- miniPage(
-    gadgetTitleBar("SQL Workbench")
+    gadgetTitleBar("SQL Workbench"),
+    miniTabstripPanel(
+      miniTabPanel("Connect", icon = icon("database"),
+          miniContentPanel(
+            fileInput("load_file", "Load File")
+          )
+      )
+    )
   )
   
   server <- function(input, output, session) {
     
+    # read the file when it is uploaded
+    return_df = eventReactive(input$load_file,{
+      df = readRDS(input$load_file$datapath)
+      return(df)
+    })
+    
     # when "Done" is clicked return the text
     observeEvent(input$done, {
-      stopApp(rstudioapi::insertText("Hello World"))
+      stopApp(return_df())
     })
   }
 
