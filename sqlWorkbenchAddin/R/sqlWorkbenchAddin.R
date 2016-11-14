@@ -13,7 +13,14 @@ sqlWorkbenchAddin <- function() {
     miniTabstripPanel(
       miniTabPanel("Connect", icon = icon("database"),
           miniContentPanel(
-            fileInput("load_file", "Load File")
+            fileInput("load_file", "Load File"),
+            textInput("sql_host", "Hostname", "127.0.0.1"),
+            textInput("sql_user", "Username", "root"),
+            textInput("sql_port", "Port", "3306"),
+            passwordInput("sql_pw", "Password"),
+            actionButton("sql_conn_btn", "Connect"),
+            textInput("sql_db", "Select SQL DB", "barug"),
+            textInput("sql_table_input", "Select SQL Table", "iris")
           )
       ),
       miniTabPanel("Table", icon = icon("table"),
@@ -51,6 +58,26 @@ sqlWorkbenchAddin <- function() {
                   })
     })
     
+    observeEvent(input$sql_conn_btn, {
+      # connect to the SQL database
+      
+      library(RMySQL)
+      
+      if (input$sql_pw == "") {
+        # no password can't pass empty string
+        conn = dbConnect(MySQL(), host = input$sql_host, dbname = input$sql_db,
+                         user = input$sql_user, port = as.integer(input$sql_port))
+      } else {
+        conn = dbConnect(MySQL(), host = input$sql_host, dbname = "barug",
+                         user = input$sql_user, port = as.integer(input$sql_port),
+                         password = input$sql_pw)
+      }
+
+      # query table and return response to reactive table
+      response = dbSendQuery(conn, paste("select * from ", input$sql_table_input))
+      df$table = dbFetch(response)
+    })
+    
     # Output a DataTable (js package, not data.table R package)
     # set options https://datatables.net/reference/option/
     output$sql_table = renderDataTable(
@@ -84,6 +111,17 @@ sqlWorkbenchAddin <- function() {
     
     # when "Done" is clicked return the text
     observeEvent(input$done, {
+      
+      # Disconnect database if there is a connection
+      db_conns = dbListConnections(MySQL())
+      for (con in db_conns) {
+        dbDisconnect(con)
+      }
+      
+      # add the table to Rstudio workspace global environment
+      .GlobalEnv$mydf = df$table
+      
+      # return table to console. Save by setting mydf = .Last.value
       stopApp(df$table)
     })
   }
