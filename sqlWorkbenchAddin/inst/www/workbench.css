@@ -1,0 +1,9 @@
+.gadget-tabs-container ul.gadget-tabs {
+    background-color: #ADD8E6;
+}
+.gadget-tabs-container .fa {
+  color: #1C86EE;
+}
+#sql_conn_btn {
+  margin-top:25px;
+}

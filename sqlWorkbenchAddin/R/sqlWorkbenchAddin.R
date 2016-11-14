@@ -8,19 +8,25 @@ sqlWorkbenchAddin <- function() {
   # get verbose output from shiny for debugging
   options(shiny.trace = TRUE)
 
+  # path to the installed www folder
+  addin_resources = system.file("www", package = "sqlWorkbenchAddin")
+
   ui <- miniPage(
+    tags$head(includeCSS(file.path(addin_resources, "workbench.css"))),
     gadgetTitleBar("SQL Workbench"),
     miniTabstripPanel(
       miniTabPanel("Connect", icon = icon("database"),
-          miniContentPanel(
-            fileInput("load_file", "Load File"),
-            textInput("sql_host", "Hostname", "127.0.0.1"),
+          miniContentPanel(fillPage(
+            fillRow(fileInput("load_file", "Load File"), height="100px"),
+            fillRow(textInput("sql_host", "Hostname", "127.0.0.1"),
             textInput("sql_user", "Username", "root"),
-            textInput("sql_port", "Port", "3306"),
-            passwordInput("sql_pw", "Password"),
-            actionButton("sql_conn_btn", "Connect"),
+            textInput("sql_port", "Port", "3306"), height="100px"),
+            fillRow(passwordInput("sql_pw", "Password"),
+            actionButton("sql_conn_btn", "Connect", 
+                         style = "background-color:red; color:white;"),
             textInput("sql_db", "Select SQL DB", "barug"),
-            textInput("sql_table_input", "Select SQL Table", "iris")
+            textInput("sql_table_input", "Select SQL Table", "iris"), height="100px")
+          )
           )
       ),
       miniTabPanel("Table", icon = icon("table"),
