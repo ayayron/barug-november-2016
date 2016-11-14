@@ -5,7 +5,7 @@ As part of your standard data/analytics/software development process, you may wr
 
 For this tutorial, I'll walk through building an example Shiny gadget, a SQL database workbench in Shiny that is integrated into your RStudio session to pull data, save queries, and plot results to streamline your ad-hoc querying process.
 
-Each of the commits in the repository is a step in the process. You can get everything by cloning the repository:
+Each of the [commits](https://github.com/ayayron/barug-november-2016/commits/master) in the repository is a step in the process. You can get everything by cloning the repository:
 
 `git clone https://github.com/ayayron/sql_workbench_addin.git`
 
