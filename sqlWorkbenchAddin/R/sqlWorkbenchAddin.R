@@ -4,6 +4,7 @@ sqlWorkbenchAddin <- function() {
   library(shiny)
   library(miniUI)
   library(ggplot2)
+  library(shinyAce)
   
   # get verbose output from shiny for debugging
   options(shiny.trace = TRUE)
@@ -25,7 +26,8 @@ sqlWorkbenchAddin <- function() {
             actionButton("sql_conn_btn", "Connect", 
                          style = "background-color:red; color:white;"),
             textInput("sql_db", "Select SQL DB", "barug"),
-            textInput("sql_table_input", "Select SQL Table", "iris"), height="100px")
+            textInput("sql_table_input", "Select SQL Table", "iris"), height="100px"),
+            fillRow(aceEditor("sql_editor"))
           )
           )
       ),
@@ -50,6 +52,10 @@ sqlWorkbenchAddin <- function() {
     
     # create our reactive data frame to be used later
     df = reactiveValues(table = NULL)
+    
+    # can't just add to the original editor, must update editor
+    updateAceEditor(session, "sql_editor", autoComplete = "live",
+              autoCompleteList = list(sql = c("SELECT", "FROM", "WHERE", "LIMIT")))
     
     # read the file when it is uploaded
     observeEvent(input$load_file,{
@@ -98,7 +104,8 @@ sqlWorkbenchAddin <- function() {
     })
     
     output$sql_plot = renderPlot({
-      
+      validate(need(!is.null(df$table), "Please load dataset"))
+
       # eval used to parse select input text as columns of data frame
       p = ggplot(df$table, aes(x = eval(parse(text = input$x_select)),
                               y = eval(parse(text = input$y_select)))) + 
